@@ -1,5 +1,6 @@
 import { Download, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner"; // Add this import
 import { Button } from "@/components/ui/button";
 import type { ExportProgress } from "@/lib/exporter";
@@ -25,6 +26,7 @@ export function ExportDialog({
 	exportFormat = "mp4",
 	exportedFilePath, // Add this line
 }: ExportDialogProps) {
+	const { t } = useTranslation();
 	const [showSuccess, setShowSuccess] = useState(false);
 
 	// Reset showSuccess when a new export starts or dialog reopens
@@ -64,21 +66,21 @@ export function ExportDialog({
 
 	// Get status message based on phase
 	const getStatusMessage = () => {
-		if (error) return "Please try again";
+		if (error) return t("export.tryAgain");
 		if (isCompiling || isFinalizing) {
 			if (renderProgress !== undefined && renderProgress > 0) {
-				return `Compiling GIF... ${renderProgress}%`;
+				return t("export.compilingGifProgress", { progress: renderProgress });
 			}
-			return "Compiling GIF... This may take a while";
+			return t("export.compilingGifWait");
 		}
-		return "This may take a moment...";
+		return t("export.takeMoment");
 	};
 
 	// Get title based on phase
 	const getTitle = () => {
-		if (error) return "Export Failed";
-		if (isCompiling || isFinalizing) return "Compiling GIF";
-		return `Exporting ${formatLabel}`;
+		if (error) return t("export.exportFailed");
+		if (isCompiling || isFinalizing) return t("export.compilingGif");
+		return exportFormat === "gif" ? t("export.exportingGif") : t("export.exportingVideo");
 	};
 
 	const handleClickShowInFolder = async () => {
@@ -113,9 +115,9 @@ export function ExportDialog({
 									<Download className="w-6 h-6 text-[#34B27B]" />
 								</div>
 								<div className="flex flex-col gap-2">
-									<span className="text-xl font-bold text-slate-200 block">Export Complete</span>
+									<span className="text-xl font-bold text-slate-200 block">{t("export.exportComplete")}</span>
 									<span className="text-sm text-slate-400">
-										Your {formatLabel.toLowerCase()} is ready
+										{t("export.videoReady", { label: formatLabel.toLowerCase() })}
 									</span>
 									{exportedFilePath && (
 										<Button
@@ -123,7 +125,7 @@ export function ExportDialog({
 											onClick={handleClickShowInFolder}
 											className="mt-2 w-fit px-3 py-1 text-sm rounded-md bg-white/10 hover:bg-white/20 text-slate-200"
 										>
-											Show in Folder
+											{t("export.showInFolder")}
 										</Button>
 									)}
 									{exportedFilePath && (
@@ -178,7 +180,7 @@ export function ExportDialog({
 					<div className="space-y-6">
 						<div className="space-y-2">
 							<div className="flex justify-between text-xs font-medium text-slate-400 uppercase tracking-wider">
-								<span>{isCompiling || isFinalizing ? "Compiling" : "Rendering Frames"}</span>
+								<span>{isCompiling || isFinalizing ? t("export.compilingGif") : t("export.renderingFrames")}</span>
 								<span className="font-mono text-slate-200">
 									{isCompiling || isFinalizing ? (
 										renderProgress !== undefined && renderProgress > 0 ? (
@@ -186,7 +188,7 @@ export function ExportDialog({
 										) : (
 											<span className="flex items-center gap-2">
 												<Loader2 className="w-3 h-3 animate-spin" />
-												Processing...
+												{t("export.processing")}
 											</span>
 										)
 									) : (
@@ -230,15 +232,15 @@ export function ExportDialog({
 						<div className="grid grid-cols-2 gap-4">
 							<div className="bg-white/5 rounded-xl p-3 border border-white/5">
 								<div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
-									{isCompiling || isFinalizing ? "Status" : "Format"}
+									{isCompiling || isFinalizing ? t("export.status") : t("export.format")}
 								</div>
 								<div className="text-slate-200 font-medium text-sm">
-									{isCompiling || isFinalizing ? "Compiling..." : formatLabel}
+									{isCompiling || isFinalizing ? t("export.compiling") : formatLabel}
 								</div>
 							</div>
 							<div className="bg-white/5 rounded-xl p-3 border border-white/5">
 								<div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">
-									Frames
+									{t("export.frames")}
 								</div>
 								<div className="text-slate-200 font-medium text-sm">
 									{progress.currentFrame} / {progress.totalFrames}
@@ -253,7 +255,7 @@ export function ExportDialog({
 									variant="destructive"
 									className="w-full py-6 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30 transition-all rounded-xl"
 								>
-									Cancel Export
+									{t("export.cancelExport")}
 								</Button>
 							</div>
 						)}
@@ -262,7 +264,7 @@ export function ExportDialog({
 
 				{showSuccess && (
 					<div className="text-center py-4 animate-in zoom-in-95">
-						<p className="text-lg text-slate-200 font-medium">{formatLabel} saved successfully!</p>
+						<p className="text-lg text-slate-200 font-medium">{t("export.videoSavedSuccess", { label: formatLabel })}</p>
 					</div>
 				)}
 			</div>

@@ -1,10 +1,12 @@
 import { HelpCircle, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useShortcuts } from "@/contexts/ShortcutsContext";
 import { formatBinding, SHORTCUT_ACTIONS, SHORTCUT_LABELS } from "@/lib/shortcuts";
 import { formatShortcut } from "@/utils/platformUtils";
 
 export function KeyboardShortcutsHelp() {
+	const { t } = useTranslation();
 	const { shortcuts, isMac, openConfig } = useShortcuts();
 
 	const [scrollLabels, setScrollLabels] = useState({
@@ -25,22 +27,22 @@ export function KeyboardShortcutsHelp() {
 
 			<div className="absolute right-0 top-full mt-2 w-64 bg-[#09090b] border border-white/10 rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-xl z-50">
 				<div className="flex items-center justify-between mb-2">
-					<span className="text-xs font-semibold text-slate-200">Keyboard Shortcuts</span>
+					<span className="text-xs font-semibold text-slate-200">{t("shortcuts.keyboardShortcuts")}</span>
 					<button
 						type="button"
 						onClick={openConfig}
-						title="Customize shortcuts"
+						title={t("shortcuts.customizeShortcuts")}
 						className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-[#34B27B] transition-colors"
 					>
 						<Settings2 className="w-3 h-3" />
-						Customize
+						{t("shortcuts.customize")}
 					</button>
 				</div>
 
 				<div className="space-y-1.5 text-[10px]">
 					{SHORTCUT_ACTIONS.map((action) => (
 						<div key={action} className="flex items-center justify-between">
-							<span className="text-slate-400">{SHORTCUT_LABELS[action]}</span>
+							<span className="text-slate-400">{t(SHORTCUT_LABELS[action])}</span>
 							<kbd className="px-1 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-mono">
 								{formatBinding(shortcuts[action], isMac)}
 							</kbd>
@@ -49,19 +51,19 @@ export function KeyboardShortcutsHelp() {
 
 					<div className="pt-1 border-t border-white/5 mt-1">
 						<div className="flex items-center justify-between">
-							<span className="text-slate-400">Pan Timeline</span>
+							<span className="text-slate-400">{t("shortcuts.panTimeline")}</span>
 							<kbd className="px-1 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-mono">
 								{scrollLabels.pan}
 							</kbd>
 						</div>
 						<div className="flex items-center justify-between mt-1.5">
-							<span className="text-slate-400">Zoom Timeline</span>
+							<span className="text-slate-400">{t("shortcuts.zoomTimeline")}</span>
 							<kbd className="px-1 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-mono">
 								{scrollLabels.zoom}
 							</kbd>
 						</div>
 						<div className="flex items-center justify-between mt-1.5">
-							<span className="text-slate-400">Cycle Annotations</span>
+							<span className="text-slate-400">{t("shortcuts.cycleAnnotations")}</span>
 							<kbd className="px-1 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-mono">
 								Tab
 							</kbd>

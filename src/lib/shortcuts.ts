@@ -27,19 +27,19 @@ export interface FixedShortcut {
 }
 
 export const FIXED_SHORTCUTS: FixedShortcut[] = [
-	{ label: "Cycle Annotations Forward", display: "Tab", bindings: [{ key: "tab" }] },
+	{ label: "shortcuts.cycleAnnotationsForward", display: "Tab", bindings: [{ key: "tab" }] },
 	{
-		label: "Cycle Annotations Backward",
+		label: "shortcuts.cycleAnnotationsBackward",
 		display: "Shift + Tab",
 		bindings: [{ key: "tab", shift: true }],
 	},
 	{
-		label: "Delete Selected (alt)",
+		label: "shortcuts.deleteSelectedAlt",
 		display: "Del / ⌫",
 		bindings: [{ key: "delete" }, { key: "backspace" }],
 	},
-	{ label: "Pan Timeline", display: "Shift + Ctrl + Scroll", bindings: [] },
-	{ label: "Zoom Timeline", display: "Ctrl + Scroll", bindings: [] },
+	{ label: "shortcuts.panTimeline", display: "Shift + Ctrl + Scroll", bindings: [] },
+	{ label: "shortcuts.zoomTimeline", display: "Ctrl + Scroll", bindings: [] },
 ];
 
 export type ShortcutConflict =
@@ -84,13 +84,13 @@ export const DEFAULT_SHORTCUTS: ShortcutsConfig = {
 };
 
 export const SHORTCUT_LABELS: Record<ShortcutAction, string> = {
-	addZoom: "Add Zoom",
-	addTrim: "Add Trim",
-	addSpeed: "Add Speed",
-	addAnnotation: "Add Annotation",
-	addKeyframe: "Add Keyframe",
-	deleteSelected: "Delete Selected",
-	playPause: "Play / Pause",
+	addZoom: "shortcuts.addZoom",
+	addTrim: "shortcuts.addTrim",
+	addSpeed: "shortcuts.addSpeed",
+	addAnnotation: "shortcuts.addAnnotation",
+	addKeyframe: "shortcuts.addKeyframe",
+	deleteSelected: "shortcuts.deleteSelected",
+	playPause: "shortcuts.playPause",
 };
 
 export function matchesShortcut(

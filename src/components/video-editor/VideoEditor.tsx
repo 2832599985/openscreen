@@ -1,5 +1,6 @@
 import type { Span } from "dnd-timeline";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -55,6 +56,7 @@ import {
 import VideoPlayback, { VideoPlaybackRef } from "./VideoPlayback";
 
 export default function VideoEditor() {
+	const { t } = useTranslation();
 	const [videoPath, setVideoPath] = useState<string | null>(null);
 	const [videoSourcePath, setVideoSourcePath] = useState<string | null>(null);
 	const [currentProjectPath, setCurrentProjectPath] = useState<string | null>(null);
@@ -248,10 +250,10 @@ export default function VideoEditor() {
 					setCurrentProjectPath(null);
 					setLastSavedSnapshot(null);
 				} else {
-					setError("No video to load. Please record or select a video.");
+					setError(t("videoEditor.noVideoToLoad"));
 				}
 			} catch (err) {
-				setError("Error loading video: " + String(err));
+				setError(t("videoEditor.errorLoadingVideo", { error: String(err) }));
 			} finally {
 				setLoading(false);
 			}
@@ -263,13 +265,13 @@ export default function VideoEditor() {
 	const saveProject = useCallback(
 		async (forceSaveAs: boolean) => {
 			if (!videoPath) {
-				toast.error("No video loaded");
+				toast.error(t("videoEditor.noVideoLoaded"));
 				return;
 			}
 
 			const sourcePath = videoSourcePath ?? fromFileUrl(videoPath);
 			if (!sourcePath) {
-				toast.error("Unable to determine source video path");
+				toast.error(t("videoEditor.unableToDetermineSource"));
 				return;
 			}
 
@@ -306,12 +308,12 @@ export default function VideoEditor() {
 			);
 
 			if (result.canceled) {
-				toast.info("Project save canceled");
+				toast.info(t("videoEditor.projectSaveCanceled"));
 				return;
 			}
 
 			if (!result.success) {
-				toast.error(result.message || "Failed to save project");
+				toast.error(result.message || t("videoEditor.failedToSaveProject"));
 				return;
 			}
 
@@ -320,7 +322,7 @@ export default function VideoEditor() {
 			}
 			setLastSavedSnapshot(projectSnapshot);
 
-			toast.success(`Project saved to ${result.path}`);
+			toast.success(t("videoEditor.projectSaved", { path: result.path }));
 		},
 		[
 			videoPath,
@@ -375,17 +377,17 @@ export default function VideoEditor() {
 		}
 
 		if (!result.success) {
-			toast.error(result.message || "Failed to load project");
+			toast.error(result.message || t("videoEditor.failedToLoadProject"));
 			return;
 		}
 
 		const restored = await applyLoadedProject(result.project, result.path ?? null);
 		if (!restored) {
-			toast.error("Invalid project file format");
+			toast.error(t("videoEditor.invalidProjectFormat"));
 			return;
 		}
 
-		toast.success(`Project loaded from ${result.path}`);
+		toast.success(t("videoEditor.projectLoaded", { path: result.path }));
 	}, [applyLoadedProject]);
 
 	useEffect(() => {
@@ -854,13 +856,13 @@ export default function VideoEditor() {
 	const handleExport = useCallback(
 		async (settings: ExportSettings) => {
 			if (!videoPath) {
-				toast.error("No video loaded");
+				toast.error(t("videoEditor.noVideoLoaded"));
 				return;
 			}
 
 			const video = videoPlaybackRef.current?.video;
 			if (!video) {
-				toast.error("Video not ready");
+				toast.error(t("videoEditor.videoNotReady"));
 				return;
 			}
 
@@ -924,17 +926,17 @@ export default function VideoEditor() {
 						const saveResult = await window.electronAPI.saveExportedVideo(arrayBuffer, fileName);
 
 						if (saveResult.canceled) {
-							toast.info("Export canceled");
+							toast.info(t("videoEditor.exportCanceled"));
 						} else if (saveResult.success && saveResult.path) {
 							showExportSuccessToast(saveResult.path);
 							setExportedFilePath(saveResult.path);
 						} else {
-							setExportError(saveResult.message || "Failed to save GIF");
-							toast.error(saveResult.message || "Failed to save GIF");
+							setExportError(saveResult.message || t("videoEditor.failedToSaveGif"));
+							toast.error(saveResult.message || t("videoEditor.failedToSaveGif"));
 						}
 					} else {
-						setExportError(result.error || "GIF export failed");
-						toast.error(result.error || "GIF export failed");
+						setExportError(result.error || t("videoEditor.gifExportFailed"));
+						toast.error(result.error || t("videoEditor.gifExportFailed"));
 					}
 				} else {
 					// MP4 Export
@@ -1051,17 +1053,17 @@ export default function VideoEditor() {
 						const saveResult = await window.electronAPI.saveExportedVideo(arrayBuffer, fileName);
 
 						if (saveResult.canceled) {
-							toast.info("Export canceled");
+							toast.info(t("videoEditor.exportCanceled"));
 						} else if (saveResult.success && saveResult.path) {
 							showExportSuccessToast(saveResult.path);
 							setExportedFilePath(saveResult.path);
 						} else {
-							setExportError(saveResult.message || "Failed to save video");
-							toast.error(saveResult.message || "Failed to save video");
+							setExportError(saveResult.message || t("videoEditor.failedToSaveVideo"));
+							toast.error(saveResult.message || t("videoEditor.failedToSaveVideo"));
 						}
 					} else {
-						setExportError(result.error || "Export failed");
-						toast.error(result.error || "Export failed");
+						setExportError(result.error || t("videoEditor.exportFailed"));
+						toast.error(result.error || t("videoEditor.exportFailed"));
 					}
 				}
 
@@ -1072,7 +1074,7 @@ export default function VideoEditor() {
 				console.error("Export error:", error);
 				const errorMessage = error instanceof Error ? error.message : "Unknown error";
 				setExportError(errorMessage);
-				toast.error(`Export failed: ${errorMessage}`);
+				toast.error(t("videoEditor.exportFailedWithError", { error: errorMessage }));
 			} finally {
 				setIsExporting(false);
 				exporterRef.current = null;
@@ -1103,13 +1105,13 @@ export default function VideoEditor() {
 
 	const handleOpenExportDialog = useCallback(() => {
 		if (!videoPath) {
-			toast.error("No video loaded");
+			toast.error(t("videoEditor.noVideoLoaded"));
 			return;
 		}
 
 		const video = videoPlaybackRef.current?.video;
 		if (!video) {
-			toast.error("Video not ready");
+			toast.error(t("videoEditor.videoNotReady"));
 			return;
 		}
 
@@ -1148,7 +1150,7 @@ export default function VideoEditor() {
 	const handleCancelExport = useCallback(() => {
 		if (exporterRef.current) {
 			exporterRef.current.cancel();
-			toast.info("Export canceled");
+			toast.info(t("videoEditor.exportCanceled"));
 			setShowExportDialog(false);
 			setIsExporting(false);
 			setExportProgress(null);
@@ -1163,19 +1165,19 @@ export default function VideoEditor() {
 	}, []);
 
 	const showExportSuccessToast = useCallback((filePath: string) => {
-		toast.success(`Exported successfully to ${filePath}`, {
+		toast.success(t("videoEditor.exportedSuccessfully", { path: filePath }), {
 			action: {
-				label: "Show in Folder",
+				label: t("videoEditor.showInFolder"),
 				onClick: async () => {
 					try {
 						const result = await window.electronAPI.revealInFolder(filePath);
 						if (!result.success) {
 							const errorMessage =
-								result.error || result.message || "Failed to reveal item in folder.";
+								result.error || result.message || t("videoEditor.failedToReveal");
 							toast.error(errorMessage);
 						}
 					} catch (err) {
-						toast.error(`Error revealing in folder: ${String(err)}`);
+						toast.error(t("videoEditor.errorRevealingInFolder", { error: String(err) }));
 					}
 				},
 			},

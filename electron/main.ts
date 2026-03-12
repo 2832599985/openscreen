@@ -117,57 +117,57 @@ function setupApplicationMenu() {
 
 	template.push(
 		{
-			label: "File",
+			label: "文件",
 			submenu: [
 				{
-					label: "Load Project…",
+					label: "加载项目…",
 					accelerator: "CmdOrCtrl+O",
 					click: () => sendEditorMenuAction("menu-load-project"),
 				},
 				{
-					label: "Save Project…",
+					label: "保存项目…",
 					accelerator: "CmdOrCtrl+S",
 					click: () => sendEditorMenuAction("menu-save-project"),
 				},
 				{
-					label: "Save Project As…",
+					label: "另存项目…",
 					accelerator: "CmdOrCtrl+Shift+S",
 					click: () => sendEditorMenuAction("menu-save-project-as"),
 				},
-				...(isMac ? [] : [{ type: "separator" as const }, { role: "quit" as const }]),
+				...(isMac ? [] : [{ type: "separator" as const }, { role: "quit" as const, label: "退出" }]),
 			],
 		},
 		{
-			label: "Edit",
+			label: "编辑",
 			submenu: [
-				{ role: "undo" },
-				{ role: "redo" },
+				{ role: "undo", label: "撤销" },
+				{ role: "redo", label: "重做" },
 				{ type: "separator" },
-				{ role: "cut" },
-				{ role: "copy" },
-				{ role: "paste" },
-				{ role: "selectAll" },
+				{ role: "cut", label: "剪切" },
+				{ role: "copy", label: "复制" },
+				{ role: "paste", label: "粘贴" },
+				{ role: "selectAll", label: "全选" },
 			],
 		},
 		{
-			label: "View",
+			label: "视图",
 			submenu: [
-				{ role: "reload" },
-				{ role: "forceReload" },
-				{ role: "toggleDevTools" },
+				{ role: "reload", label: "重新加载" },
+				{ role: "forceReload", label: "强制重新加载" },
+				{ role: "toggleDevTools", label: "开发者工具" },
 				{ type: "separator" },
-				{ role: "resetZoom" },
-				{ role: "zoomIn" },
-				{ role: "zoomOut" },
+				{ role: "resetZoom", label: "重置缩放" },
+				{ role: "zoomIn", label: "放大" },
+				{ role: "zoomOut", label: "缩小" },
 				{ type: "separator" },
-				{ role: "togglefullscreen" },
+				{ role: "togglefullscreen", label: "全屏" },
 			],
 		},
 		{
-			label: "Window",
+			label: "窗口",
 			submenu: isMac
-				? [{ role: "minimize" }, { role: "zoom" }, { type: "separator" }, { role: "front" }]
-				: [{ role: "minimize" }, { role: "close" }],
+				? [{ role: "minimize", label: "最小化" }, { role: "zoom" }, { type: "separator" }, { role: "front" }]
+				: [{ role: "minimize", label: "最小化" }, { role: "close", label: "关闭" }],
 		},
 	);
 
@@ -192,11 +192,11 @@ function getTrayIcon(filename: string) {
 function updateTrayMenu(recording: boolean = false) {
 	if (!tray) return;
 	const trayIcon = recording ? recordingTrayIcon : defaultTrayIcon;
-	const trayToolTip = recording ? `Recording: ${selectedSourceName}` : "OpenScreen";
+	const trayToolTip = recording ? `正在录制: ${selectedSourceName}` : "OpenScreen";
 	const menuTemplate = recording
 		? [
 				{
-					label: "Stop Recording",
+					label: "停止录制",
 					click: () => {
 						if (mainWindow && !mainWindow.isDestroyed()) {
 							mainWindow.webContents.send("stop-recording-from-tray");
@@ -206,7 +206,7 @@ function updateTrayMenu(recording: boolean = false) {
 			]
 		: [
 				{
-					label: "Open",
+					label: "打开",
 					click: () => {
 						if (mainWindow && !mainWindow.isDestroyed()) {
 							mainWindow.isMinimized() && mainWindow.restore();
@@ -216,7 +216,7 @@ function updateTrayMenu(recording: boolean = false) {
 					},
 				},
 				{
-					label: "Quit",
+					label: "退出",
 					click: () => {
 						app.quit();
 					},
@@ -251,12 +251,12 @@ function createEditorWindowWrapper() {
 
 		const choice = dialog.showMessageBoxSync(mainWindow!, {
 			type: "warning",
-			buttons: ["Save & Close", "Discard & Close", "Cancel"],
+			buttons: ["保存并关闭", "放弃并关闭", "取消"],
 			defaultId: 0,
 			cancelId: 2,
-			title: "Unsaved Changes",
-			message: "You have unsaved changes.",
-			detail: "Do you want to save your project before closing?",
+			title: "未保存的更改",
+			message: "您有未保存的更改。",
+			detail: "关闭前是否要保存项目？",
 		});
 
 		if (choice === 0) {

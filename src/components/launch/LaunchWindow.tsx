@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BsRecordCircle } from "react-icons/bs";
 import { FaRegStopCircle } from "react-icons/fa";
 import { FaFolderOpen } from "react-icons/fa6";
@@ -12,6 +13,7 @@ import { AudioLevelMeter } from "../ui/audio-level-meter";
 import styles from "./LaunchWindow.module.css";
 
 export function LaunchWindow() {
+	const { t } = useTranslation();
 	const {
 		recording,
 		toggleRecording,
@@ -65,7 +67,7 @@ export function LaunchWindow() {
 		const s = (seconds % 60).toString().padStart(2, "0");
 		return `${m}:${s}`;
 	};
-	const [selectedSource, setSelectedSource] = useState("Screen");
+	const [selectedSource, setSelectedSource] = useState(t("launch.screen"));
 	const [hasSelectedSource, setHasSelectedSource] = useState(false);
 
 	useEffect(() => {
@@ -76,7 +78,7 @@ export function LaunchWindow() {
 					setSelectedSource(source.name);
 					setHasSelectedSource(true);
 				} else {
-					setSelectedSource("Screen");
+					setSelectedSource(t("launch.screen"));
 					setHasSelectedSource(false);
 				}
 			}
@@ -192,7 +194,7 @@ export function LaunchWindow() {
 							className={`${styles.hudIconBtn} ${systemAudioEnabled ? styles.hudIconActive : ""}`}
 							onClick={() => !recording && setSystemAudioEnabled(!systemAudioEnabled)}
 							disabled={recording}
-							title={systemAudioEnabled ? "Disable system audio" : "Enable system audio"}
+							title={systemAudioEnabled ? t("launch.disableSystemAudio") : t("launch.enableSystemAudio")}
 						>
 							{systemAudioEnabled ? (
 								<MdVolumeUp size={15} className="text-green-400" />
@@ -204,7 +206,7 @@ export function LaunchWindow() {
 							className={`${styles.hudIconBtn} ${microphoneEnabled ? styles.hudIconActive : ""}`}
 							onClick={toggleMicrophone}
 							disabled={recording}
-							title={microphoneEnabled ? "Disable microphone" : "Enable microphone"}
+							title={microphoneEnabled ? t("launch.disableMicrophone") : t("launch.enableMicrophone")}
 						>
 							{microphoneEnabled ? (
 								<MdMic size={15} className="text-green-400" />
@@ -241,7 +243,7 @@ export function LaunchWindow() {
 						className={`${styles.hudIconBtn} ${styles.electronNoDrag}`}
 						onClick={openVideoFile}
 						disabled={recording}
-						title="Open video file"
+						title={t("launch.openVideoFile")}
 					>
 						<MdVideoFile size={14} className="text-white/60" />
 					</button>
@@ -251,17 +253,17 @@ export function LaunchWindow() {
 						className={`${styles.hudIconBtn} ${styles.electronNoDrag}`}
 						onClick={openProjectFile}
 						disabled={recording}
-						title="Open project"
+						title={t("launch.openProject")}
 					>
 						<FaFolderOpen size={14} className="text-white/60" />
 					</button>
 
 					{/* Window controls */}
 					<div className={`flex items-center gap-0.5 ${styles.electronNoDrag}`}>
-						<button className={styles.windowBtn} title="Hide HUD" onClick={sendHudOverlayHide}>
+						<button className={styles.windowBtn} title={t("launch.hideHud")} onClick={sendHudOverlayHide}>
 							<FiMinus size={14} className="text-white" />
 						</button>
-						<button className={styles.windowBtn} title="Close App" onClick={sendHudOverlayClose}>
+						<button className={styles.windowBtn} title={t("launch.closeApp")} onClick={sendHudOverlayClose}>
 							<FiX size={14} className="text-white" />
 						</button>
 					</div>

@@ -11,6 +11,7 @@ import {
 	ZoomIn,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
@@ -468,6 +469,7 @@ function Timeline({
 	selectedSpeedId?: string | null;
 	keyframes?: { id: string; time: number }[];
 }) {
+	const { t } = useTranslation();
 	const { setTimelineRef, style, sidebarWidth, range, pixelsToValue } = useTimelineContext();
 	const localTimelineRef = useRef<HTMLDivElement | null>(null);
 
@@ -536,7 +538,7 @@ function Timeline({
 				keyframes={keyframes}
 			/>
 
-			<Row id={ZOOM_ROW_ID} isEmpty={zoomItems.length === 0} hint="Press Z to add zoom">
+			<Row id={ZOOM_ROW_ID} isEmpty={zoomItems.length === 0} hint={t("timeline.pressZToAddZoom")}>
 				{zoomItems.map((item) => (
 					<Item
 						id={item.id}
@@ -553,7 +555,7 @@ function Timeline({
 				))}
 			</Row>
 
-			<Row id={TRIM_ROW_ID} isEmpty={trimItems.length === 0} hint="Press T to add trim">
+			<Row id={TRIM_ROW_ID} isEmpty={trimItems.length === 0} hint={t("timeline.pressTToAddTrim")}>
 				{trimItems.map((item) => (
 					<Item
 						id={item.id}
@@ -572,7 +574,7 @@ function Timeline({
 			<Row
 				id={ANNOTATION_ROW_ID}
 				isEmpty={annotationItems.length === 0}
-				hint="Press A to add annotation"
+				hint={t("timeline.pressAToAddAnnotation")}
 			>
 				{annotationItems.map((item) => (
 					<Item
@@ -589,7 +591,7 @@ function Timeline({
 				))}
 			</Row>
 
-			<Row id={SPEED_ROW_ID} isEmpty={speedItems.length === 0} hint="Press S to add speed">
+			<Row id={SPEED_ROW_ID} isEmpty={speedItems.length === 0} hint={t("timeline.pressSToAddSpeed")}>
 				{speedItems.map((item) => (
 					<Item
 						id={item.id}
@@ -643,6 +645,7 @@ export default function TimelineEditor({
 	onAspectRatioChange,
 }: TimelineEditorProps) {
 	const totalMs = useMemo(() => Math.max(0, Math.round(videoDuration * 1000)), [videoDuration]);
+	const { t } = useTranslation();
 	const currentTimeMs = useMemo(() => Math.round(currentTime * 1000), [currentTime]);
 	const timelineScale = useMemo(() => calculateTimelineScale(videoDuration), [videoDuration]);
 	const safeMinDurationMs = useMemo(
@@ -848,8 +851,8 @@ export default function TimelineEditor({
 			(region) => startPos >= region.startMs && startPos < region.endMs,
 		);
 		if (isOverlapping || gapToNext <= 0) {
-			toast.error("Cannot place zoom here", {
-				description: "Zoom already exists at this location or not enough space available.",
+			toast.error(t("timeline.cannotPlaceZoom"), {
+				description: t("timeline.cannotPlaceZoomDesc"),
 			});
 			return;
 		}
@@ -864,13 +867,13 @@ export default function TimelineEditor({
 		}
 
 		if (!onZoomSuggested) {
-			toast.error("Zoom suggestion handler unavailable");
+			toast.error(t("timeline.zoomSuggestionUnavailable"));
 			return;
 		}
 
 		if (cursorTelemetry.length < 2) {
-			toast.info("No cursor telemetry available", {
-				description: "Record a screencast first to generate cursor-based suggestions.",
+			toast.info(t("timeline.noCursorTelemetry"), {
+				description: t("timeline.noCursorTelemetryDesc"),
 			});
 			return;
 		}
@@ -887,8 +890,8 @@ export default function TimelineEditor({
 		const normalizedSamples = normalizeCursorTelemetry(cursorTelemetry, totalMs);
 
 		if (normalizedSamples.length < 2) {
-			toast.info("No usable cursor telemetry", {
-				description: "The recording does not include enough cursor movement data.",
+			toast.info(t("timeline.noUsableTelemetry"), {
+				description: t("timeline.noUsableTelemetryDesc"),
 			});
 			return;
 		}
@@ -896,8 +899,8 @@ export default function TimelineEditor({
 		const dwellCandidates = detectZoomDwellCandidates(normalizedSamples);
 
 		if (dwellCandidates.length === 0) {
-			toast.info("No clear cursor dwell moments found", {
-				description: "Try a recording with slower cursor pauses on important actions.",
+			toast.info(t("timeline.noDwellMoments"), {
+				description: t("timeline.noDwellMomentsDesc"),
 			});
 			return;
 		}
@@ -934,13 +937,13 @@ export default function TimelineEditor({
 		});
 
 		if (addedCount === 0) {
-			toast.info("No auto-zoom slots available", {
-				description: "Detected dwell points overlap existing zoom regions.",
+			toast.info(t("timeline.noAutoZoomSlots"), {
+				description: t("timeline.noAutoZoomSlotsDesc"),
 			});
 			return;
 		}
 
-		toast.success(`Added ${addedCount} cursor-based zoom suggestion${addedCount === 1 ? "" : "s"}`);
+		toast.success(t("timeline.addedZoomSuggestions", { count: addedCount }));
 	}, [
 		videoDuration,
 		totalMs,
@@ -972,8 +975,8 @@ export default function TimelineEditor({
 			(region) => startPos >= region.startMs && startPos < region.endMs,
 		);
 		if (isOverlapping || gapToNext <= 0) {
-			toast.error("Cannot place trim here", {
-				description: "Trim already exists at this location or not enough space available.",
+			toast.error(t("timeline.cannotPlaceTrim"), {
+				description: t("timeline.cannotPlaceTrimDesc"),
 			});
 			return;
 		}
@@ -1004,8 +1007,8 @@ export default function TimelineEditor({
 			(region) => startPos >= region.startMs && startPos < region.endMs,
 		);
 		if (isOverlapping || gapToNext <= 0) {
-			toast.error("Cannot place speed here", {
-				description: "Speed region already exists at this location or not enough space available.",
+			toast.error(t("timeline.cannotPlaceSpeed"), {
+				description: t("timeline.cannotPlaceSpeedDesc"),
 			});
 			return;
 		}
@@ -1135,7 +1138,7 @@ export default function TimelineEditor({
 			id: region.id,
 			rowId: ZOOM_ROW_ID,
 			span: { start: region.startMs, end: region.endMs },
-			label: `Zoom ${index + 1}`,
+			label: t("timeline.zoomLabel", { index: index + 1 }),
 			zoomDepth: region.depth,
 			variant: "zoom",
 		}));
@@ -1144,7 +1147,7 @@ export default function TimelineEditor({
 			id: region.id,
 			rowId: TRIM_ROW_ID,
 			span: { start: region.startMs, end: region.endMs },
-			label: `Trim ${index + 1}`,
+			label: t("timeline.trimLabel", { index: index + 1 }),
 			variant: "trim",
 		}));
 
@@ -1153,12 +1156,12 @@ export default function TimelineEditor({
 
 			if (region.type === "text") {
 				// Show text preview
-				const preview = region.content.trim() || "Empty text";
+				const preview = region.content.trim() || t("timeline.emptyText");
 				label = preview.length > 20 ? `${preview.substring(0, 20)}...` : preview;
 			} else if (region.type === "image") {
-				label = "Image";
+				label = t("timeline.imageLabel");
 			} else {
-				label = "Annotation";
+				label = t("timeline.annotationLabel");
 			}
 
 			return {
@@ -1174,13 +1177,13 @@ export default function TimelineEditor({
 			id: region.id,
 			rowId: SPEED_ROW_ID,
 			span: { start: region.startMs, end: region.endMs },
-			label: `Speed ${index + 1}`,
+			label: t("timeline.speedLabel", { index: index + 1 }),
 			speedValue: region.speed,
 			variant: "speed",
 		}));
 
 		return [...zooms, ...trims, ...annotations, ...speeds];
-	}, [zoomRegions, trimRegions, annotationRegions, speedRegions]);
+	}, [zoomRegions, trimRegions, annotationRegions, speedRegions, t]);
 
 	// Flat list of all non-annotation region spans for neighbour-clamping during drag/resize
 	const allRegionSpans = useMemo(() => {
@@ -1222,8 +1225,8 @@ export default function TimelineEditor({
 					<Plus className="w-6 h-6 text-slate-600" />
 				</div>
 				<div className="text-center">
-					<p className="text-sm font-medium text-slate-300">No Video Loaded</p>
-					<p className="text-xs text-slate-500 mt-1">Drag and drop a video to start editing</p>
+					<p className="text-sm font-medium text-slate-300">{t("timeline.noVideoLoaded")}</p>
+					<p className="text-xs text-slate-500 mt-1">{t("timeline.dragDropVideo")}</p>
 				</div>
 			</div>
 		);
@@ -1238,7 +1241,7 @@ export default function TimelineEditor({
 						variant="ghost"
 						size="icon"
 						className="h-7 w-7 text-slate-400 hover:text-[#34B27B] hover:bg-[#34B27B]/10 transition-all"
-						title="Add Zoom (Z)"
+						title={t("timeline.addZoomTitle")}
 					>
 						<ZoomIn className="w-4 h-4" />
 					</Button>
@@ -1247,7 +1250,7 @@ export default function TimelineEditor({
 						variant="ghost"
 						size="icon"
 						className="h-7 w-7 text-slate-400 hover:text-[#34B27B] hover:bg-[#34B27B]/10 transition-all"
-						title="Suggest Zooms from Cursor"
+						title={t("timeline.suggestZoomsTitle")}
 					>
 						<WandSparkles className="w-4 h-4" />
 					</Button>
@@ -1256,7 +1259,7 @@ export default function TimelineEditor({
 						variant="ghost"
 						size="icon"
 						className="h-7 w-7 text-slate-400 hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-all"
-						title="Add Trim (T)"
+						title={t("timeline.addTrimTitle")}
 					>
 						<Scissors className="w-4 h-4" />
 					</Button>
@@ -1265,7 +1268,7 @@ export default function TimelineEditor({
 						variant="ghost"
 						size="icon"
 						className="h-7 w-7 text-slate-400 hover:text-[#B4A046] hover:bg-[#B4A046]/10 transition-all"
-						title="Add Annotation (A)"
+						title={t("timeline.addAnnotationTitle")}
 					>
 						<MessageSquare className="w-4 h-4" />
 					</Button>
@@ -1274,7 +1277,7 @@ export default function TimelineEditor({
 						variant="ghost"
 						size="icon"
 						className="h-7 w-7 text-slate-400 hover:text-[#d97706] hover:bg-[#d97706]/10 transition-all"
-						title="Add Speed (S)"
+						title={t("timeline.addSpeedTitle")}
 					>
 						<Gauge className="w-4 h-4" />
 					</Button>
@@ -1313,13 +1316,13 @@ export default function TimelineEditor({
 						<kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-sans">
 							{scrollLabels.pan}
 						</kbd>
-						<span>Pan</span>
+						<span>{t("timeline.pan")}</span>
 					</span>
 					<span className="flex items-center gap-1.5">
 						<kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[#34B27B] font-sans">
 							{scrollLabels.zoom}
 						</kbd>
-						<span>Zoom</span>
+						<span>{t("timeline.zoom")}</span>
 					</span>
 				</div>
 			</div>
